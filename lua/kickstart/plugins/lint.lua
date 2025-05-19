@@ -10,6 +10,17 @@ return {
         python = { 'mypy', 'ruff' },
       }
 
+      local function find_venv_python()
+        local path = os.getenv 'VIRTUAL_ENV' and os.getenv 'VIRTUAL_ENV' .. '/bin/python' or vim.fn.getcwd() .. '/.venv/bin/python'
+        return path
+      end
+
+      local mypy = lint.linters.mypy
+      local new_args = { '--python-executable', find_venv_python() }
+      for _, v in ipairs(new_args) do
+        table.insert(mypy.args, v)
+      end
+      -- mypy.args = { '--python-executable', find_venv_python(), '--show-column-numbers' }
       -- To allow other plugins to add linters to require('lint').linters_by_ft,
       -- instead set linters_by_ft like this:
       -- lint.linters_by_ft = lint.linters_by_ft or {}
@@ -56,6 +67,18 @@ return {
           end
         end,
       })
+
+      local lint_progress = function()
+        local linters = lint.get_running()
+        if #linters == 0 then
+          return ' '
+        end
+        return ' ' .. table.concat(linters, ', ')
+      end
+
+      vim.api.nvim_create_user_command('LintProgress', function()
+        print(lint_progress())
+      end, {})
     end,
   },
 }
