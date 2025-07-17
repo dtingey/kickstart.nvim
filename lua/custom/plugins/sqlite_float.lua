@@ -10,7 +10,7 @@ local function create_temp_init_file()
   local tmpfile = vim.fn.tempname() .. '.sql'
   local f, err = io.open(tmpfile, 'w')
   if not f then
-    vim.api.nvim_err_writeln('Failed to create init file: ' .. (err or 'unknown error'))
+    vim.api.nvim_echo({ { 'Failed to create init file: ' .. (err or 'unknown error') } }, true, { err = true })
     return nil
   end
 
@@ -21,12 +21,12 @@ end
 
 function M.open(db_path)
   if db_path == nil or db_path == '' then
-    vim.api.nvim_err_writeln 'You must provide a path to a database file.'
+    vim.api.nvim_echo({ { 'You must provide a path to a database file.\n' } }, true, { err = true })
     return
   end
 
   if not db_path:match '%.sqlite3?$' and not db_path:match '%.db$' then
-    vim.api.nvim_err_writeln 'File is not a valid SQLite database.'
+    vim.api.nvim_echo({ { 'File is not a valid SQLite database.\n' } }, true, { err = true })
     return
   end
 
@@ -93,7 +93,7 @@ end
 
 function M.open_from_path(path)
   if not path or path == '' then
-    vim.api.nvim_err_writeln 'No valid path provided.'
+    vim.api.nvim_echo({ { 'No valid path provided.\n' } }, true, { err = true })
     return
   end
   M.open(vim.fn.fnameescape(path))
